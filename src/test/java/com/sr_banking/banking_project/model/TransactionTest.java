@@ -20,6 +20,7 @@ class TransactionTest {
 
     @BeforeEach
     void setUp() {
+        // Create a reusable BankAccount instance for tests that need a linked account.
         sampleAccount = new BankAccount();
         sampleAccount.setId(1L);
         sampleAccount.setAccountNumber("ACC1001");
@@ -32,6 +33,9 @@ class TransactionTest {
     @DisplayName("Default Constructor")
     class DefaultConstructorTests {
 
+        // Verifies that the no-arg constructor automatically sets transactionDate
+        // to the current time (LocalDateTime.now()), ensuring it falls within a
+        // tight before/after window captured around construction.
         @Test
         @DisplayName("sets transactionDate to current time")
         void setsTransactionDateToNow() {
@@ -44,6 +48,9 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isBeforeOrEqualTo(after);
         }
 
+        // Verifies that the no-arg constructor does NOT initialize any field other
+        // than transactionDate. All other fields (id, transactionId, transactionType,
+        // amount, description, bankAccount) should remain null.
         @Test
         @DisplayName("leaves all other fields null/default")
         void leavesOtherFieldsNull() {
@@ -62,6 +69,8 @@ class TransactionTest {
     @DisplayName("Parameterized Constructor")
     class ParameterizedConstructorTests {
 
+        // Verifies that the 4-arg constructor correctly stores the transactionType,
+        // amount, description, and bankAccount reference passed to it.
         @Test
         @DisplayName("sets all provided fields correctly")
         void setsAllFields() {
@@ -76,6 +85,8 @@ class TransactionTest {
             assertThat(tx.getBankAccount()).isSameAs(sampleAccount);
         }
 
+        // Verifies that the parameterized constructor auto-generates a transactionId
+        // that is non-null and begins with the "TXN" prefix.
         @Test
         @DisplayName("generates transactionId starting with TXN")
         void generatesTransactionId() {
@@ -85,6 +96,9 @@ class TransactionTest {
             assertThat(tx.getTransactionId()).startsWith("TXN");
         }
 
+        // Verifies that the numeric portion of the auto-generated transactionId
+        // (after the "TXN" prefix) is a valid millis timestamp that falls within
+        // the window captured around construction.
         @Test
         @DisplayName("transactionId contains millis timestamp after TXN prefix")
         void transactionIdContainsTimestamp() {
@@ -98,6 +112,9 @@ class TransactionTest {
             assertThat(timestamp).isBetween(before, after);
         }
 
+        // Verifies that two separately constructed transactions each get a
+        // transactionId with the correct "TXN" prefix. (Strict uniqueness cannot
+        // be guaranteed when both are created within the same millisecond.)
         @Test
         @DisplayName("two transactions get different transactionIds")
         void uniqueTransactionIds() {
@@ -111,6 +128,8 @@ class TransactionTest {
             assertThat(tx2.getTransactionId()).startsWith("TXN");
         }
 
+        // Verifies that the parameterized constructor also sets transactionDate
+        // to the current time, just like the default constructor does.
         @Test
         @DisplayName("sets transactionDate to current time")
         void setsTransactionDate() {
@@ -123,6 +142,8 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isBeforeOrEqualTo(after);
         }
 
+        // Verifies that the JPA-managed id field remains null after construction
+        // (it would only be assigned after persistence by the database).
         @Test
         @DisplayName("id remains null before persistence")
         void idRemainsNull() {
@@ -130,6 +151,8 @@ class TransactionTest {
             assertThat(tx.getId()).isNull();
         }
 
+        // Parameterized test verifying that the constructor correctly stores
+        // various transaction type strings (DEPOSIT, WITHDRAWAL, TRANSFER, etc.).
         @ParameterizedTest
         @DisplayName("works with various transaction types")
         @ValueSource(strings = {"DEPOSIT", "WITHDRAWAL", "TRANSFER", "REFUND", "FEE"})
@@ -138,6 +161,8 @@ class TransactionTest {
             assertThat(tx.getTransactionType()).isEqualTo(type);
         }
 
+        // Verifies that the constructor accepts a null transactionType without
+        // throwing an exception, storing null as the type.
         @Test
         @DisplayName("accepts null transactionType")
         void acceptsNullTransactionType() {
@@ -145,6 +170,8 @@ class TransactionTest {
             assertThat(tx.getTransactionType()).isNull();
         }
 
+        // Verifies that the constructor accepts a null amount without
+        // throwing an exception, storing null as the amount.
         @Test
         @DisplayName("accepts null amount")
         void acceptsNullAmount() {
@@ -152,6 +179,8 @@ class TransactionTest {
             assertThat(tx.getAmount()).isNull();
         }
 
+        // Verifies that the constructor accepts a null description without
+        // throwing an exception, storing null as the description.
         @Test
         @DisplayName("accepts null description")
         void acceptsNullDescription() {
@@ -159,6 +188,8 @@ class TransactionTest {
             assertThat(tx.getDescription()).isNull();
         }
 
+        // Verifies that the constructor accepts a null bankAccount reference
+        // without throwing an exception, storing null.
         @Test
         @DisplayName("accepts null bankAccount")
         void acceptsNullBankAccount() {
@@ -178,6 +209,7 @@ class TransactionTest {
             tx = new Transaction();
         }
 
+        // Verifies the basic round-trip of setId and getId with a valid Long value.
         @Test
         @DisplayName("setId / getId")
         void idGetterSetter() {
@@ -185,6 +217,7 @@ class TransactionTest {
             assertThat(tx.getId()).isEqualTo(42L);
         }
 
+        // Verifies that setId accepts null, clearing a previously set id value.
         @Test
         @DisplayName("setId with null")
         void idSetNull() {
@@ -193,6 +226,7 @@ class TransactionTest {
             assertThat(tx.getId()).isNull();
         }
 
+        // Verifies the basic round-trip of setTransactionId and getTransactionId.
         @Test
         @DisplayName("setTransactionId / getTransactionId")
         void transactionIdGetterSetter() {
@@ -200,6 +234,7 @@ class TransactionTest {
             assertThat(tx.getTransactionId()).isEqualTo("TXN999");
         }
 
+        // Verifies that setTransactionId accepts null, clearing a previously set value.
         @Test
         @DisplayName("setTransactionId with null")
         void transactionIdSetNull() {
@@ -208,6 +243,8 @@ class TransactionTest {
             assertThat(tx.getTransactionId()).isNull();
         }
 
+        // Parameterized test verifying that setTransactionType correctly stores
+        // and returns each of the common transaction type strings.
         @ParameterizedTest
         @DisplayName("setTransactionType with various values")
         @ValueSource(strings = {"DEPOSIT", "WITHDRAWAL", "TRANSFER"})
@@ -216,6 +253,7 @@ class TransactionTest {
             assertThat(tx.getTransactionType()).isEqualTo(type);
         }
 
+        // Verifies that setTransactionType accepts null, clearing a previously set type.
         @Test
         @DisplayName("setTransactionType with null")
         void transactionTypeSetNull() {
@@ -224,6 +262,7 @@ class TransactionTest {
             assertThat(tx.getTransactionType()).isNull();
         }
 
+        // Verifies that setAmount correctly stores and returns a positive BigDecimal.
         @Test
         @DisplayName("setAmount / getAmount with positive value")
         void amountPositive() {
@@ -231,6 +270,7 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(new BigDecimal("250.75"));
         }
 
+        // Verifies that setAmount correctly handles BigDecimal.ZERO.
         @Test
         @DisplayName("setAmount with zero")
         void amountZero() {
@@ -238,6 +278,8 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(BigDecimal.ZERO);
         }
 
+        // Verifies that setAmount correctly stores a negative BigDecimal value
+        // (the entity itself does not enforce positivity).
         @Test
         @DisplayName("setAmount with negative value")
         void amountNegative() {
@@ -245,6 +287,8 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(new BigDecimal("-100.00"));
         }
 
+        // Verifies that setAmount handles a very large BigDecimal without truncation
+        // or precision loss.
         @Test
         @DisplayName("setAmount with very large value")
         void amountLargeValue() {
@@ -253,6 +297,7 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(large);
         }
 
+        // Verifies that setAmount accepts null, clearing a previously set amount.
         @Test
         @DisplayName("setAmount with null")
         void amountNull() {
@@ -261,6 +306,7 @@ class TransactionTest {
             assertThat(tx.getAmount()).isNull();
         }
 
+        // Verifies the basic round-trip of setDescription and getDescription.
         @Test
         @DisplayName("setDescription / getDescription")
         void descriptionGetterSetter() {
@@ -268,6 +314,7 @@ class TransactionTest {
             assertThat(tx.getDescription()).isEqualTo("Monthly salary");
         }
 
+        // Verifies that setDescription correctly stores an empty string.
         @Test
         @DisplayName("setDescription with empty string")
         void descriptionEmpty() {
@@ -275,6 +322,8 @@ class TransactionTest {
             assertThat(tx.getDescription()).isEmpty();
         }
 
+        // Verifies that setDescription correctly handles Unicode characters,
+        // including the Indian Rupee symbol and emoji.
         @Test
         @DisplayName("setDescription with unicode characters")
         void descriptionUnicode() {
@@ -282,6 +331,7 @@ class TransactionTest {
             assertThat(tx.getDescription()).isEqualTo("Payment \u20B9500 for groceries \uD83D\uDED2");
         }
 
+        // Verifies that setDescription accepts null, clearing a previously set value.
         @Test
         @DisplayName("setDescription with null")
         void descriptionNull() {
@@ -290,6 +340,8 @@ class TransactionTest {
             assertThat(tx.getDescription()).isNull();
         }
 
+        // Verifies the basic round-trip of setTransactionDate and getTransactionDate
+        // with a specific LocalDateTime value.
         @Test
         @DisplayName("setTransactionDate / getTransactionDate")
         void transactionDateGetterSetter() {
@@ -298,6 +350,8 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isEqualTo(date);
         }
 
+        // Verifies that setting transactionDate to null overrides the default value
+        // that was auto-assigned by the default constructor.
         @Test
         @DisplayName("setTransactionDate with null overrides default")
         void transactionDateSetNull() {
@@ -306,6 +360,8 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isNull();
         }
 
+        // Verifies the basic round-trip of setBankAccount and getBankAccount,
+        // checking that the exact same object reference is returned.
         @Test
         @DisplayName("setBankAccount / getBankAccount")
         void bankAccountGetterSetter() {
@@ -313,6 +369,7 @@ class TransactionTest {
             assertThat(tx.getBankAccount()).isSameAs(sampleAccount);
         }
 
+        // Verifies that setBankAccount accepts null, clearing a previously set reference.
         @Test
         @DisplayName("setBankAccount with null")
         void bankAccountSetNull() {
@@ -321,6 +378,8 @@ class TransactionTest {
             assertThat(tx.getBankAccount()).isNull();
         }
 
+        // Verifies that the bankAccount reference can be reassigned from one
+        // BankAccount to a different one, and getBankAccount reflects the change.
         @Test
         @DisplayName("setBankAccount can be changed to different account")
         void bankAccountReassignment() {
@@ -340,6 +399,8 @@ class TransactionTest {
     @DisplayName("toString Method")
     class ToStringTests {
 
+        // Verifies that toString() output contains all key fields: transaction type,
+        // amount, description, and a "Date:" label.
         @Test
         @DisplayName("includes transaction type, amount, description, and date")
         void includesAllFields() {
@@ -352,6 +413,8 @@ class TransactionTest {
             assertThat(result).contains("Date:");
         }
 
+        // Verifies the exact format of toString() output using a fixed date,
+        // ensuring it matches "TYPE | Amount: AMOUNT | Desc: DESC | Date: DATE".
         @Test
         @DisplayName("format matches expected pattern")
         void matchesExpectedFormat() {
@@ -368,6 +431,8 @@ class TransactionTest {
                     "WITHDRAWAL | Amount: \u20B9500.00 | Desc: ATM withdrawal | Date: 2024-03-15T14:30");
         }
 
+        // Verifies that toString() does not throw when all fields are null,
+        // and that it still contains the structural labels (Amount:, Desc:, Date:).
         @Test
         @DisplayName("handles null fields gracefully in toString")
         void handlesNullFields() {
@@ -385,6 +450,8 @@ class TransactionTest {
             assertThat(result).contains("Date:");
         }
 
+        // Verifies that toString() correctly renders a zero amount and still
+        // includes the transaction type and description.
         @Test
         @DisplayName("toString with zero amount")
         void toStringZeroAmount() {
@@ -406,6 +473,8 @@ class TransactionTest {
     @DisplayName("Edge Cases and Boundary Values")
     class EdgeCaseTests {
 
+        // Verifies that a BigDecimal with many decimal places (high precision)
+        // is stored and returned without loss of precision.
         @Test
         @DisplayName("amount with many decimal places")
         void amountManyDecimals() {
@@ -415,6 +484,8 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(precise);
         }
 
+        // Verifies that a very long description string (10,000 characters)
+        // is stored in full without truncation at the entity level.
         @Test
         @DisplayName("very long description string")
         void veryLongDescription() {
@@ -424,6 +495,8 @@ class TransactionTest {
             assertThat(tx.getDescription()).hasSize(10000);
         }
 
+        // Verifies that a manually set transactionId via the setter overrides
+        // the auto-generated "TXN..." value from the parameterized constructor.
         @Test
         @DisplayName("transactionId set manually overrides generated value")
         void manualTransactionIdOverride() {
@@ -434,6 +507,7 @@ class TransactionTest {
             assertThat(tx.getTransactionId()).isEqualTo("CUSTOM-ID-001");
         }
 
+        // Verifies that transactionDate can be set to a date in the past.
         @Test
         @DisplayName("transaction date can be set to past date")
         void pastDate() {
@@ -443,6 +517,7 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isEqualTo(past);
         }
 
+        // Verifies that transactionDate can be set to a date in the future.
         @Test
         @DisplayName("transaction date can be set to future date")
         void futureDate() {
@@ -452,6 +527,9 @@ class TransactionTest {
             assertThat(tx.getTransactionDate()).isEqualTo(future);
         }
 
+        // Parameterized test verifying that various boundary BigDecimal values
+        // (smallest positive, zero, smallest negative, very large, sub-cent)
+        // are stored and returned correctly.
         @ParameterizedTest
         @DisplayName("amount edge values")
         @CsvSource({
@@ -468,6 +546,8 @@ class TransactionTest {
             assertThat(tx.getAmount()).isEqualByComparingTo(amt);
         }
 
+        // Verifies that the parameterized constructor accepts an empty string
+        // as the transactionType without error.
         @Test
         @DisplayName("empty string transactionType")
         void emptyTransactionType() {
@@ -475,6 +555,8 @@ class TransactionTest {
             assertThat(tx.getTransactionType()).isEmpty();
         }
 
+        // Verifies that the parameterized constructor accepts an empty string
+        // as the description without error.
         @Test
         @DisplayName("empty string description in constructor")
         void emptyDescriptionInConstructor() {
@@ -487,6 +569,9 @@ class TransactionTest {
     @DisplayName("BankAccount Relationship")
     class BankAccountRelationshipTests {
 
+        // Verifies that a Transaction created via the parameterized constructor
+        // holds a non-null reference to the BankAccount, and that the account's
+        // properties (accountNumber, accountHolderName) are accessible through it.
         @Test
         @DisplayName("transaction holds reference to BankAccount")
         void holdsAccountReference() {
@@ -496,6 +581,9 @@ class TransactionTest {
             assertThat(tx.getBankAccount().getAccountHolderName()).isEqualTo("Test User");
         }
 
+        // Verifies that the BankAccount reference is shared (not copied), so
+        // modifying the account's balance through the transaction's reference
+        // is reflected on the original sampleAccount object.
         @Test
         @DisplayName("modifying bankAccount through transaction reference reflects changes")
         void mutableAccountReference() {
@@ -505,6 +593,8 @@ class TransactionTest {
             assertThat(sampleAccount.getBalance()).isEqualByComparingTo(new BigDecimal("9999.99"));
         }
 
+        // Verifies that two different Transaction objects can reference the
+        // exact same BankAccount instance (identity check with isSameAs).
         @Test
         @DisplayName("multiple transactions can reference same BankAccount")
         void multipleTransactionsSameAccount() {
@@ -514,6 +604,9 @@ class TransactionTest {
             assertThat(tx1.getBankAccount()).isSameAs(tx2.getBankAccount());
         }
 
+        // Verifies that a transaction's bankAccount can be changed from one
+        // account to another via setBankAccount, and that getBankAccount
+        // returns the newly assigned account.
         @Test
         @DisplayName("transaction can be reassigned to different BankAccount")
         void reassignAccount() {
