@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
     "spring.sql.init.mode=never",
     "spring.jpa.defer-datasource-initialization=false"
@@ -23,6 +23,7 @@ class BankingProjectApplicationTest {
     @DisplayName("main method runs without exception")
     void mainMethodRuns() {
         BankingProjectApplication.main(new String[]{
+            "--server.port=0",
             "--spring.sql.init.mode=never",
             "--spring.jpa.defer-datasource-initialization=false"
         });
