@@ -58,6 +58,16 @@ class BankControllerTest {
     }
 
     @Test
+    void transfer_usesCallerDescription_returns201() throws Exception {
+        mockMvc.perform(post("/api/v1/transfers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fromAccount\":\"ACC1003\",\"toAccount\":\"ACC1004\",\"amount\":100.00,\"description\":\"rent payment\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.transactionType").value("WITHDRAWAL"))
+                .andExpect(jsonPath("$.description").value("rent payment (to ACC1004)"));
+    }
+
+    @Test
     void getAccount_unknown_returns404() throws Exception {
         mockMvc.perform(get("/api/v1/accounts/DOES_NOT_EXIST"))
                 .andExpect(status().isNotFound())

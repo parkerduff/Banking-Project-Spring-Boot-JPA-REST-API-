@@ -84,10 +84,10 @@ public class BankService {
                                      BigDecimal amount, String description) {
 
         Transaction withdrawalTransaction = withdrawMoney(fromAccountNumber, amount,
-                "Transfer to account: " + toAccountNumber);
+                description + " (to " + toAccountNumber + ")");
 
         depositMoney(toAccountNumber, amount,
-                "Transfer from account: " + fromAccountNumber);
+                description + " (from " + fromAccountNumber + ")");
 
         return withdrawalTransaction;
     }
