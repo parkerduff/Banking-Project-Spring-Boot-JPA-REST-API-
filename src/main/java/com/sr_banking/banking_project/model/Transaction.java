@@ -96,6 +96,6 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return transactionType + " | Amount: ₹" + amount + " | Desc: " + description + " | Date: " + transactionDate;
+        return transactionType + " | Amount: " + amount + " | Desc: " + description + " | Date: " + transactionDate;
     }
 }

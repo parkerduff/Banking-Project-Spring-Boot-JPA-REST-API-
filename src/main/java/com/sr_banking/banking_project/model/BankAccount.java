@@ -17,19 +17,25 @@ public class BankAccount {
     private String accountHolderName;
     private String accountType;
     private BigDecimal balance;
+
+    // ISO 4217 currency code (e.g. SGD, USD)
+    private String currency;
+
     private LocalDateTime createdAt;
 
     // Default Constructor
     public BankAccount() {
         this.balance = BigDecimal.ZERO;
+        this.currency = "SGD";
         this.createdAt = LocalDateTime.now();
     }
 
     // Parameterized Constructor
-    public BankAccount(String accountHolderName, String accountType, BigDecimal balance) {
+    public BankAccount(String accountHolderName, String accountType, BigDecimal balance, String currency) {
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
         this.balance = balance;
+        this.currency = currency;
         this.createdAt = LocalDateTime.now();
         this.accountNumber = "ACC" + System.currentTimeMillis();
     }
@@ -53,6 +59,10 @@ public class BankAccount {
 
     public BigDecimal getBalance() {
         return balance;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -80,12 +90,17 @@ public class BankAccount {
         this.balance = balance;
     }
 
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     @Override
     public String toString() {
-        return "Account: " + accountNumber + " | Holder: " + accountHolderName + " | Balance: ₹" + balance;
+        return "Account: " + accountNumber + " | Holder: " + accountHolderName
+                + " | Balance: " + balance + " " + currency;
     }
 }

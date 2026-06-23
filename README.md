@@ -83,16 +83,28 @@ spring.jpa.hibernate.ddl-auto=update
 
 ## 🔗 API Endpoints  
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST   | `/create`             | Create Account |
-| POST   | `/deposit/{id}/{amt}` | Deposit Money 💰 |
-| POST   | `/withdraw/{id}/{amt}`| Withdraw Money 🏧 |
-| POST   | `/transfer/{from}/{to}/{amt}` | Transfer Funds 🔄 |
-| GET    | `/balance/{id}`       | Check Balance 💳 |
-| GET    | `/statement/{id}`     | Transaction History 📜 |
+All write operations take a **JSON request body** (not query/path params), use **noun-based, versioned** resource paths, and return JSON. Monetary amounts carry an ISO 4217 `currency`.
 
-👉 **Base URL:** `http://localhost:8080/api/bank`  
+| Method | Endpoint | Description | Request body |
+|--------|----------|-------------|--------------|
+| POST   | `/accounts`                                | Create account            | `{ "accountHolderName", "accountType" (SAVINGS\|CURRENT), "initialDeposit", "currency"? }` |
+| GET    | `/accounts`                                | List accounts             | — |
+| GET    | `/accounts/{accountNumber}`                | Get account               | — |
+| POST   | `/accounts/{accountNumber}/deposits`       | Deposit 💰                | `{ "amount", "description"? }` |
+| POST   | `/accounts/{accountNumber}/withdrawals`    | Withdraw 🏧               | `{ "amount", "description"? }` |
+| POST   | `/transfers`                               | Transfer funds 🔄         | `{ "fromAccount", "toAccount", "amount", "description"? }` |
+| GET    | `/accounts/{accountNumber}/transactions`   | Statement 📜              | — |
+
+👉 **Base URL:** `http://localhost:8080/api/v1`
+
+Errors return a consistent JSON contract: `{ timestamp, status, error, message, path, fieldErrors? }` with correct HTTP status codes (`400` validation, `404` not found, `422` insufficient balance).
+
+Example:
+```bash
+curl -X POST http://localhost:8080/api/v1/accounts/ACC1001/deposits \
+  -H 'Content-Type: application/json' \
+  -d '{"amount": 250.00, "description": "Cash deposit"}'
+```
 
 ---
 
