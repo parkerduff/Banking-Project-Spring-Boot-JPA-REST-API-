@@ -1,6 +1,11 @@
 package com.sr_banking.banking_project.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -19,13 +24,11 @@ public class BankAccount {
     private BigDecimal balance;
     private LocalDateTime createdAt;
 
-    // Default Constructor
     public BankAccount() {
         this.balance = BigDecimal.ZERO;
         this.createdAt = LocalDateTime.now();
     }
 
-    // Parameterized Constructor
     public BankAccount(String accountHolderName, String accountType, BigDecimal balance) {
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
@@ -34,7 +37,6 @@ public class BankAccount {
         this.accountNumber = "ACC" + System.currentTimeMillis();
     }
 
-    // Getter Methods
     public Long getId() {
         return id;
     }
@@ -59,7 +61,6 @@ public class BankAccount {
         return createdAt;
     }
 
-    // Setter Methods
     public void setId(Long id) {
         this.id = id;
     }
@@ -82,10 +83,5 @@ public class BankAccount {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Account: " + accountNumber + " | Holder: " + accountHolderName + " | Balance: ₹" + balance;
     }
 }

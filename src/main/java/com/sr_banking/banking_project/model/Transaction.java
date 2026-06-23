@@ -1,6 +1,12 @@
 package com.sr_banking.banking_project.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -19,15 +25,13 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
-    private com.sr_banking.banking_project.model.BankAccount bankAccount;
+    private BankAccount bankAccount;
 
-    // Default Constructor
     public Transaction() {
         this.transactionDate = LocalDateTime.now();
     }
 
-    // Parameterized Constructor
-    public Transaction(String transactionType, BigDecimal amount, String description, com.sr_banking.banking_project.model.BankAccount bankAccount) {
+    public Transaction(String transactionType, BigDecimal amount, String description, BankAccount bankAccount) {
         this.transactionType = transactionType;
         this.amount = amount;
         this.description = description;
@@ -36,7 +40,6 @@ public class Transaction {
         this.transactionId = "TXN" + System.currentTimeMillis();
     }
 
-    // Getter Methods
     public Long getId() {
         return id;
     }
@@ -61,11 +64,10 @@ public class Transaction {
         return transactionDate;
     }
 
-    public com.sr_banking.banking_project.model.BankAccount getBankAccount() {
+    public BankAccount getBankAccount() {
         return bankAccount;
     }
 
-    // Setter Methods
     public void setId(Long id) {
         this.id = id;
     }
@@ -90,12 +92,7 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
-    public void setBankAccount(com.sr_banking.banking_project.model.BankAccount bankAccount) {
+    public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
-    }
-
-    @Override
-    public String toString() {
-        return transactionType + " | Amount: ₹" + amount + " | Desc: " + description + " | Date: " + transactionDate;
     }
 }
