@@ -1,12 +1,12 @@
-INSERT INTO bank_accounts (account_number, account_holder_name, account_type, balance, created_at)
+INSERT INTO bank_accounts (account_number, account_holder_name, account_type, balance, currency, created_at)
 VALUES
-('ACC1001', 'Rahul Sharma', 'SAVINGS', 5000.00, '2024-01-01 10:00:00'),
-('ACC1002', 'Priya Patel', 'CURRENT', 10000.00, '2024-01-02 11:30:00'),
-('ACC1003', 'Amit Verma', 'SAVINGS', 7500.00, '2024-01-03 09:15:00'),
-('ACC1004', 'Sonam Kapoor', 'SAVINGS', 12000.00, '2024-01-04 14:20:00'),
-('ACC1005', 'Rajesh Khanna', 'CURRENT', 8500.00, '2024-01-05 16:45:00'),
-('ACC1006', 'Anjali Singh', 'SAVINGS', 6000.00, '2024-01-06 09:30:00'),
-('ACC1007', 'Vikram Malhotra', 'CURRENT', 9500.00, '2024-01-07 13:15:00');
+('ACC1001', 'Rahul Sharma', 'SAVINGS', 5000.00, 'SGD', '2024-01-01 10:00:00'),
+('ACC1002', 'Priya Patel', 'CURRENT', 10000.00, 'SGD', '2024-01-02 11:30:00'),
+('ACC1003', 'Amit Verma', 'SAVINGS', 7500.00, 'SGD', '2024-01-03 09:15:00'),
+('ACC1004', 'Sonam Kapoor', 'SAVINGS', 12000.00, 'SGD', '2024-01-04 14:20:00'),
+('ACC1005', 'Rajesh Khanna', 'CURRENT', 8500.00, 'SGD', '2024-01-05 16:45:00'),
+('ACC1006', 'Anjali Singh', 'SAVINGS', 6000.00, 'SGD', '2024-01-06 09:30:00'),
+('ACC1007', 'Vikram Malhotra', 'CURRENT', 9500.00, 'SGD', '2024-01-07 13:15:00');
 
 INSERT INTO transactions (transaction_id, transaction_type, amount, description, transaction_date, account_id)
 VALUES

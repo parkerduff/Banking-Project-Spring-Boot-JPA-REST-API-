@@ -1,0 +1,25 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.ipr
+
+### Eclipse ###
+.classpath
+.project
+.settings/
+bin/
+
+### NetBeans ###
+nbproject/
+build/
+
+### VS Code ###
+.vscode/
+
+### OS ###
+.DS_Store
