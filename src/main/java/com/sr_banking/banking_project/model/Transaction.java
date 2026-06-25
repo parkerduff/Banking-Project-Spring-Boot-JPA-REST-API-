@@ -1,8 +1,16 @@
 package com.sr_banking.banking_project.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
@@ -14,29 +22,29 @@ public class Transaction {
     private String transactionId;
     private String transactionType;
     private BigDecimal amount;
+
+    @Column(length = 512)
     private String description;
+
     private LocalDateTime transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
-    private com.sr_banking.banking_project.model.BankAccount bankAccount;
+    private BankAccount bankAccount;
 
-    // Default Constructor
     public Transaction() {
         this.transactionDate = LocalDateTime.now();
     }
 
-    // Parameterized Constructor
-    public Transaction(String transactionType, BigDecimal amount, String description, com.sr_banking.banking_project.model.BankAccount bankAccount) {
+    public Transaction(String transactionType, BigDecimal amount, String description, BankAccount bankAccount) {
         this.transactionType = transactionType;
         this.amount = amount;
         this.description = description;
         this.bankAccount = bankAccount;
         this.transactionDate = LocalDateTime.now();
-        this.transactionId = "TXN" + System.currentTimeMillis();
+        this.transactionId = "TXN" + UUID.randomUUID().toString().replace("-", "");
     }
 
-    // Getter Methods
     public Long getId() {
         return id;
     }
@@ -61,11 +69,10 @@ public class Transaction {
         return transactionDate;
     }
 
-    public com.sr_banking.banking_project.model.BankAccount getBankAccount() {
+    public BankAccount getBankAccount() {
         return bankAccount;
     }
 
-    // Setter Methods
     public void setId(Long id) {
         this.id = id;
     }
@@ -90,12 +97,7 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
-    public void setBankAccount(com.sr_banking.banking_project.model.BankAccount bankAccount) {
+    public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
-    }
-
-    @Override
-    public String toString() {
-        return transactionType + " | Amount: ₹" + amount + " | Desc: " + description + " | Date: " + transactionDate;
     }
 }

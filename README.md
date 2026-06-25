@@ -33,23 +33,26 @@ This project covers:
 
 ## 📂 Project Structure  
 
+Standard Maven layout under `src/main/java/com/sr_banking/banking_project`:
+
 ```
-Banking_PROJECT/
- ├── controller/         # REST Endpoints (APIs)
- │    └── BankController.java
- ├── model/              # Entities (Tables)
- │    ├── BankAccount.java
- │    └── Transaction.java
- ├── repository/         # DAO Layer
- │    ├── BankAccountRepository.java
- │    └── TransactionRepository.java
- ├── service/            # Business Logic
- │    └── BankService.java
- ├── resources/
- │    ├── application.properties   # DB Config
- │    └── data.sql                 # Initial Data
- └── BankingProjectApplication.java # Main App
+src/main/java/com/sr_banking/banking_project/
+ ├── controller/   # Versioned REST endpoints (BankController)
+ ├── service/      # Business logic (BankService)
+ ├── repository/   # Spring Data JPA repositories
+ ├── model/        # JPA entities (BankAccount, Transaction)
+ ├── dto/          # Request/response records + ApiError
+ ├── exception/    # Custom exceptions + GlobalExceptionHandler
+ ├── config/       # Security, Jackson, OpenAPI configuration
+ └── web/          # FieldProjection helper
+src/main/resources/
+ ├── application.properties
+ └── data.sql
+src/test/java/...  # Service + controller (MockMvc) tests
 ```
+
+> 📐 See [`docs/ABS-MAS-COMPLIANCE.md`](docs/ABS-MAS-COMPLIANCE.md) for how this API maps to the
+> ABS-MAS Finance-as-a-Service API Playbook guidelines.
 
 ---
 
@@ -83,16 +86,45 @@ spring.jpa.hibernate.ddl-auto=update
 
 ## 🔗 API Endpoints  
 
+Resource-oriented (noun-based) and explicitly versioned. Request/response bodies are JSON.
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST   | `/create`             | Create Account |
-| POST   | `/deposit/{id}/{amt}` | Deposit Money 💰 |
-| POST   | `/withdraw/{id}/{amt}`| Withdraw Money 🏧 |
-| POST   | `/transfer/{from}/{to}/{amt}` | Transfer Funds 🔄 |
-| GET    | `/balance/{id}`       | Check Balance 💳 |
-| GET    | `/statement/{id}`     | Transaction History 📜 |
+| POST   | `/accounts`                              | Create account |
+| GET    | `/accounts?page=&size=&fields=`          | List accounts (paginated, field projection) |
+| GET    | `/accounts/{accountNumber}?fields=`      | Get one account |
+| POST   | `/accounts/{accountNumber}/deposits`     | Deposit money 💰 |
+| POST   | `/accounts/{accountNumber}/withdrawals`  | Withdraw money 🏧 |
+| GET    | `/accounts/{accountNumber}/transactions` | Statement (paginated) 📜 |
+| POST   | `/transfers`                             | Transfer funds 🔄 |
 
-👉 **Base URL:** `http://localhost:8080/api/bank`  
+👉 **Base URL:** `http://localhost:8080/api/v1/bank`  
+
+### 🔐 Authentication & Authorization
+
+All endpoints require HTTP Basic authentication. Reads need the `USER` role; state-changing
+operations (create / deposit / withdraw / transfer) need the `ADMIN` role. Demo credentials are
+configurable via environment variables (`API_USER`/`API_USER_PASSWORD`, `API_ADMIN`/`API_ADMIN_PASSWORD`);
+defaults are `user`/`changeit` and `admin`/`changeit`. **Always override these defaults before deploying
+anywhere other than local/demo use** — the app logs a warning at startup while defaults are in effect.
+
+```bash
+# Read (USER)
+curl -u user:changeit http://localhost:8080/api/v1/bank/accounts
+
+# Create (ADMIN)
+curl -u admin:changeit -X POST -H 'Content-Type: application/json' \
+  -d '{"accountHolderName":"Jane Doe","accountType":"SAVINGS","initialDeposit":500.00}' \
+  http://localhost:8080/api/v1/bank/accounts
+```
+
+> Production deployments should terminate TLS 1.2+ and replace HTTP Basic with OAuth 2.0 / OpenID
+> Connect issuing signed JWT access tokens, per the playbook's Information Security guidelines.
+
+### 📖 Interactive Docs (OpenAPI / Swagger)
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI spec: `http://localhost:8080/v3/api-docs`
 
 ---
 
@@ -113,9 +145,8 @@ INSERT INTO bank_account (id, account_holder, balance) VALUES (2, 'Rahul Verma',
 
 ## 🚀 Future Enhancements  
 
-- 🔐 JWT Authentication  
+- 🔐 OAuth 2.0 / OpenID Connect with signed JWT access tokens  
 - 🏦 Multiple Account Types (Savings / Current)  
-- 📑 Pagination for Bank Statements  
 - 📤 Export Transactions → PDF/Excel  
 - 🐳 Docker Deployment  
 
