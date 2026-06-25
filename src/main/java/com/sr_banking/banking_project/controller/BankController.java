@@ -11,12 +11,14 @@ import com.sr_banking.banking_project.model.Transaction;
 import com.sr_banking.banking_project.service.BankService;
 import com.sr_banking.banking_project.web.FieldProjection;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,9 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/bank")
+@Validated
 public class BankController {
 
     private static final int MAX_PAGE_SIZE = 100;
+    private static final String ACCOUNT_NUMBER_PATTERN = "^[A-Za-z0-9_-]{1,64}$";
 
     private final BankService bankService;
 
@@ -65,7 +69,8 @@ public class BankController {
 
     @GetMapping("/accounts/{accountNumber}")
     public ResponseEntity<?> getAccount(
-            @PathVariable String accountNumber,
+            @PathVariable @Pattern(regexp = ACCOUNT_NUMBER_PATTERN, message = "invalid account number")
+                    String accountNumber,
             @RequestParam(required = false) String fields) {
         AccountResponse body = AccountResponse.from(bankService.getAccountByNumber(accountNumber));
         return ResponseEntity.ok(FieldProjection.apply(body, fields));
@@ -73,7 +78,8 @@ public class BankController {
 
     @PostMapping("/accounts/{accountNumber}/deposits")
     public ResponseEntity<TransactionResponse> deposit(
-            @PathVariable String accountNumber,
+            @PathVariable @Pattern(regexp = ACCOUNT_NUMBER_PATTERN, message = "invalid account number")
+                    String accountNumber,
             @Valid @RequestBody MoneyMovementRequest request) {
         Transaction transaction = bankService.depositMoney(
                 accountNumber, request.amount(), description(request.description(), "Cash deposit"));
@@ -82,7 +88,8 @@ public class BankController {
 
     @PostMapping("/accounts/{accountNumber}/withdrawals")
     public ResponseEntity<TransactionResponse> withdraw(
-            @PathVariable String accountNumber,
+            @PathVariable @Pattern(regexp = ACCOUNT_NUMBER_PATTERN, message = "invalid account number")
+                    String accountNumber,
             @Valid @RequestBody MoneyMovementRequest request) {
         Transaction transaction = bankService.withdrawMoney(
                 accountNumber, request.amount(), description(request.description(), "Cash withdrawal"));
@@ -91,7 +98,8 @@ public class BankController {
 
     @GetMapping("/accounts/{accountNumber}/transactions")
     public ResponseEntity<PagedResponse<TransactionResponse>> getStatement(
-            @PathVariable String accountNumber,
+            @PathVariable @Pattern(regexp = ACCOUNT_NUMBER_PATTERN, message = "invalid account number")
+                    String accountNumber,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Page<Transaction> statement = bankService.getAccountStatement(accountNumber, pageable(page, size));

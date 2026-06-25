@@ -1,5 +1,6 @@
 package com.sr_banking.banking_project.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
@@ -20,7 +22,10 @@ public class Transaction {
     private String transactionId;
     private String transactionType;
     private BigDecimal amount;
+
+    @Column(length = 512)
     private String description;
+
     private LocalDateTime transactionDate;
 
     @ManyToOne
@@ -37,7 +42,7 @@ public class Transaction {
         this.description = description;
         this.bankAccount = bankAccount;
         this.transactionDate = LocalDateTime.now();
-        this.transactionId = "TXN" + System.currentTimeMillis();
+        this.transactionId = "TXN" + UUID.randomUUID().toString().replace("-", "");
     }
 
     public Long getId() {

@@ -6,8 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "bank_accounts")
@@ -24,6 +26,9 @@ public class BankAccount {
     private BigDecimal balance;
     private LocalDateTime createdAt;
 
+    @Version
+    private Long version;
+
     public BankAccount() {
         this.balance = BigDecimal.ZERO;
         this.createdAt = LocalDateTime.now();
@@ -34,7 +39,7 @@ public class BankAccount {
         this.accountType = accountType;
         this.balance = balance;
         this.createdAt = LocalDateTime.now();
-        this.accountNumber = "ACC" + System.currentTimeMillis();
+        this.accountNumber = "ACC" + UUID.randomUUID().toString().replace("-", "");
     }
 
     public Long getId() {
@@ -61,6 +66,10 @@ public class BankAccount {
         return createdAt;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -83,5 +92,9 @@ public class BankAccount {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

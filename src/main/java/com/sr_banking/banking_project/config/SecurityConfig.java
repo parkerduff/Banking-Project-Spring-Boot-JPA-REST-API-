@@ -1,5 +1,7 @@
 package com.sr_banking.banking_project.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final String DEFAULT_PASSWORD = "changeit";
+
     private final String userName;
     private final String userPassword;
     private final String adminName;
@@ -50,6 +55,10 @@ public class SecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsManager(PasswordEncoder passwordEncoder) {
+        if (DEFAULT_PASSWORD.equals(userPassword) || DEFAULT_PASSWORD.equals(adminPassword)) {
+            log.warn("Default API credentials are in use. Set API_USER_PASSWORD and API_ADMIN_PASSWORD "
+                    + "(and API_USER/API_ADMIN) to secure values before deploying outside local/demo use.");
+        }
         UserDetails reader = User.withUsername(userName)
                 .password(passwordEncoder.encode(userPassword))
                 .roles("USER")
@@ -71,8 +80,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/actuator/health",
-                                "/h2-console/**")
+                                "/actuator/health")
                         .permitAll()
                         // State-changing money operations require an elevated role.
                         .requestMatchers(HttpMethod.POST, "/api/v1/bank/**").hasRole("ADMIN")

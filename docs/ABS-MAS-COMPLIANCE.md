@@ -47,6 +47,24 @@ repository implements them, and records the gaps this change set closed.
 | `POST /api/bank/accounts/transfer?fromAccount=&toAccount=` | `POST /api/v1/bank/transfers` |
 | `GET /api/bank/accounts/statement/{accountNumber}` | `GET /api/v1/bank/accounts/{accountNumber}/transactions` |
 
+## Post-review hardening
+
+Additional fixes applied in response to automated review, strengthening the playbook's
+*Secure API Coding*, *Error Handling*, and *Information Security* guidelines:
+
+- **Collision-free identifiers**: `accountNumber` / `transactionId` now use UUIDs instead of
+  `System.currentTimeMillis()`, which could collide for entities created in the same millisecond
+  (notably the two transactions a transfer writes back-to-back).
+- **Concurrency control**: `BankAccount` carries a JPA `@Version` field, so concurrent
+  balance updates fail fast with an optimistic-lock error rather than silently losing updates.
+- **Transaction description sizing**: `Transaction.description` is `@Column(length = 512)` so
+  transfer notes (user text + appended transfer context) cannot overflow the column at runtime.
+- **Path-variable validation**: `accountNumber` path variables are constrained
+  (`@Pattern`, max length); malformed values return `400` via the global handler.
+- **Reduced attack surface**: the H2 console is disabled by default (opt-in via
+  `H2_CONSOLE_ENABLED`) and removed from the public allow-list; the actuator health endpoint is
+  pinned to `show-details=never`; default credentials trigger a startup warning.
+
 ## Notes on remaining "baseline" items
 
 - **Authentication**: The playbook's recommended standards are OAuth 2.0 / OpenID Connect with

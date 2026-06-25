@@ -90,6 +90,14 @@ class BankControllerTest {
     }
 
     @Test
+    void malformedAccountNumberReturnsBadRequest() throws Exception {
+        mockMvc.perform(get("/api/v1/bank/accounts/bad!name")
+                        .with(user("reader").roles("USER")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)));
+    }
+
+    @Test
     void fieldProjectionLimitsReturnedProperties() throws Exception {
         mockMvc.perform(get("/api/v1/bank/accounts/ACC1001")
                         .param("fields", "accountNumber")

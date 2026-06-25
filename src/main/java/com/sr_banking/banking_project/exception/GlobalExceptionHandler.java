@@ -2,6 +2,7 @@ package com.sr_banking.banking_project.exception;
 
 import com.sr_banking.banking_project.dto.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<ApiError.FieldErrorDetail> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> new ApiError.FieldErrorDetail(error.getField(), error.getDefaultMessage()))
+                .toList();
+        return build(HttpStatus.BAD_REQUEST, "Validation failed for request", request, fieldErrors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+        List<ApiError.FieldErrorDetail> fieldErrors = ex.getConstraintViolations().stream()
+                .map(violation ->
+                        new ApiError.FieldErrorDetail(violation.getPropertyPath().toString(), violation.getMessage()))
                 .toList();
         return build(HttpStatus.BAD_REQUEST, "Validation failed for request", request, fieldErrors);
     }

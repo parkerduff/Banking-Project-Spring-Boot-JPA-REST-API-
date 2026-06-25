@@ -105,7 +105,8 @@ Resource-oriented (noun-based) and explicitly versioned. Request/response bodies
 All endpoints require HTTP Basic authentication. Reads need the `USER` role; state-changing
 operations (create / deposit / withdraw / transfer) need the `ADMIN` role. Demo credentials are
 configurable via environment variables (`API_USER`/`API_USER_PASSWORD`, `API_ADMIN`/`API_ADMIN_PASSWORD`);
-defaults are `user`/`changeit` and `admin`/`changeit`.
+defaults are `user`/`changeit` and `admin`/`changeit`. **Always override these defaults before deploying
+anywhere other than local/demo use** — the app logs a warning at startup while defaults are in effect.
 
 ```bash
 # Read (USER)
